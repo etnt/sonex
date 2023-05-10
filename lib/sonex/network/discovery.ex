@@ -9,6 +9,8 @@ alias Sonex.Network.State
 defmodule Sonex.Discovery do
   use GenServer
 
+  import SweetXml
+
   require Logger
 
   @playersearch ~S"""
@@ -81,6 +83,7 @@ defmodule Sonex.Discovery do
   end
 
   def handle_info({:udp, _socket, ip, _fromport, packet}, state) do
+    IO.inspect(packet, label: "udp packet")
     with this_player <- parse_upnp(ip, packet),
          {name, icon, config} <- attributes(this_player),
          {:bridge, true} <- {:bridge, name != "BRIDGE"},
@@ -105,19 +108,21 @@ defmodule Sonex.Discovery do
     {:noreply, state}
   end
 
+  def handle_info(:initialize_network, state) do
+    IO.inspect(state, label: "handing initialize_network")
+    state = attempt_network_init(state)
+    IO.inspect(state, label: "handing initialize_network 2")
+    {:noreply, state}
+  end
+
   def handle_cast(:kill, state) do
     :ok = :gen_udp.close(state.socket)
     {:noreply, state}
   end
 
   def handle_cast(:discover, state) do
+    IO.inspect(state, label: "discover")
     :gen_udp.send(state.socket, @multicastaddr, @multicastport, @playersearch)
-    {:noreply, state}
-  end
-
-  def handle_info(:initialize_network, state) do
-    IO.inspect(state, label: "handing initialize_network")
-    state = attempt_network_init(state)
     {:noreply, state}
   end
 

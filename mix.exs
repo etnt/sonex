@@ -16,7 +16,10 @@ defmodule Sonex.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpoison, :cowboy, :ranch], mod: {Sonex.Application, []}]
+    [
+      mod: {Sonex.Application, []},
+      extra_applications: [:logger, :httpoison, :cowboy, :ranch]
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -29,6 +32,8 @@ defmodule Sonex.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:httpoison, "~> 1.6"}, {:sweet_xml, "~> 0.6"}, {:cowboy, "~> 2.6"}]
+    [{:httpoison, "~> 1.6"},
+     {:sweet_xml, "~> 0.7.1"},
+     {:cowboy, "~> 2.6"}]
   end
 end
